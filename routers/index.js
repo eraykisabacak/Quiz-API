@@ -1,9 +1,10 @@
 const express = require('express');
-
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.json({data:"Hello World"});
-});
+const user = require('./user');
+const auth = require('./auth');
+
+router.use('/user',user);
+router.use('/auth',auth);
 
 module.exports = router;
