@@ -8,8 +8,7 @@ const AnswerSchema = new Schema({
     },
     question_id: {
         type: mongoose.Schema.ObjectId,
-        ref: "Question",
-        required:true
+        ref: "Question"
     }
 });
 
