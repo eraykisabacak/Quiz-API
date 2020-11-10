@@ -9,7 +9,6 @@ const { sendToJWTToToken } = require('../helpers/authorization/tokenHelpers');
 const login = asyncErrorWrapper(async (req, res, next) => {
     
     const { email, password } = req.body;
-    console.log(email, password);
 
     if (!email && !password) return next(new CustomError("Email and Password required", 400));
 
@@ -24,11 +23,24 @@ const login = asyncErrorWrapper(async (req, res, next) => {
 
 const register = asyncErrorWrapper(async (req, res, next) => {
     
-    console.log(req.body);
     const { email, username, password,role } = req.body;
     const user = await User.create({ email, username, password, role });
     
     sendToJWTToToken(user, res);
 });
 
-module.exports = {login, register};
+const tokentest = asyncErrorWrapper(async (req, res, next) => {
+    res.status(200).json({
+        success: true,
+        message: "Welcome"
+    })
+});
+
+const getLoggedInUser = async (req, res, next) => {
+    res.status(200).json({
+        success: true,
+        data:req.user
+    })
+}; 
+
+module.exports = {login, register, tokentest,getLoggedInUser};
