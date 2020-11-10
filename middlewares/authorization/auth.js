@@ -8,7 +8,7 @@ const getAccessToRoute = (req, res, next) => {
     const { JWT_SECRET_KEY } = process.env;
 
     if (!isTokenIncluded(req)) {
-        return next(new CustomError("You are not authorized to access this route",401));
+        return next(new CustomError("You are not authorized to access this route",401))
     }
 
     accessToken = getAccessTokenFromHeader(req);

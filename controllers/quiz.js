@@ -12,7 +12,7 @@ const addQuiz = asyncErrorWrapper(async (req, res, next) => {
     const { name,questions } = req.body;
 
     // Quiz Created
-    const quiz = await Quiz.create({ name: name });
+    const quiz = await Quiz.create({ name: name, createdUser:req.user.id });
     const quizId = await quiz.id;
 
     await questions.forEach(async (question) => {
