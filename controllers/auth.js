@@ -21,6 +21,19 @@ const login = asyncErrorWrapper(async (req, res, next) => {
     sendToJWTToToken(user,res)
 });
 
+const logout = asyncErrorWrapper(async (req, res, next) => {
+    const {NODE_ENV } = process.env;
+
+    return res.status(200).cookie({
+        httpOnly: true,
+        expires: new Date(Date.now()),
+        secure:NODE_ENV=='development' ? false : true
+    }).json({
+        success: true,
+        message:"Logout Successfull"
+    })
+})
+
 const register = asyncErrorWrapper(async (req, res, next) => {
     
     const { email, username, password,role } = req.body;
@@ -43,4 +56,4 @@ const getLoggedInUser = async (req, res, next) => {
     })
 }; 
 
-module.exports = {login, register, tokentest,getLoggedInUser};
+module.exports = {login, register, tokentest,getLoggedInUser,logout};

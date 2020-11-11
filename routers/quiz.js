@@ -6,7 +6,7 @@ const { getSingleQuiz, addQuiz,getAllQuiz,deleteQuiz } = require('../controllers
 const { checkQuizExist } = require('../middlewares/database/databaseErrorHelpers');
 
 router.post('/', getAccessToRoute, addQuiz);
-router.get('/', getAllQuiz);
+router.get('/', getAccessToRoute,getAllQuiz);
 router.get('/:quiz_id', checkQuizExist, getSingleQuiz);
 
 router.delete('/:quiz_id', checkQuizExist, deleteQuiz);
