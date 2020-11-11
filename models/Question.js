@@ -19,6 +19,10 @@ const QuestionSchema = new Schema({
             ref: "Answer"
         }
     ],
+    createdUser: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User"
+    }
 });
 
 QuestionSchema.post('remove', async function () {

@@ -19,7 +19,7 @@ const addQuiz = asyncErrorWrapper(async (req, res, next) => {
     await questions.forEach(async (question) => {
 
         // Question Created
-        const questionArray = await Question.create({ questionContent: question.questionContent });
+        const questionArray = await Question.create({ questionContent: question.questionContent,createdUser:req.user.id });
         const quizAddQuestion = await Quiz.findById(quizId);
         // Question Added To Quiz
         await quizAddQuestion.questions.push(questionArray.id);
@@ -27,7 +27,7 @@ const addQuiz = asyncErrorWrapper(async (req, res, next) => {
 
         // Correct Answer Added To Question
         question.correctAnswers.forEach(async function (correct, index) { 
-            const answerArray = await Answer.create({ answer: correct.answer });
+            const answerArray = await Answer.create({ answer: correct.answer,createdUser:req.user.id });
             const questionAddAnswer = await Question.findById(questionArray.id);
             await questionAddAnswer.correctAnswers.push(answerArray.id);
             await questionAddAnswer.save();
@@ -35,7 +35,7 @@ const addQuiz = asyncErrorWrapper(async (req, res, next) => {
 
         // InCorrect Answer Added To Question
         question.incorrectAnswers.forEach(async function (inCorrect, index) {
-            const answerArray = await Answer.create({ answer: inCorrect.answer });
+            const answerArray = await Answer.create({ answer: inCorrect.answer,createdUser:req.user.id });
             const questionAddAnswer = await Question.findById(questionArray.id);
             await questionAddAnswer.incorrectAnswers.push(answerArray.id);
             await questionAddAnswer.save();
