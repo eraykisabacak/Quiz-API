@@ -23,4 +23,11 @@ const QuizSchema = new Schema({
     }
 });
 
+QuizSchema.post('remove', async function () {
+    await this.questions.forEach(async function (element) { 
+        const question = await Question.findById(element);
+        await question.remove();
+    });    
+})
+
 module.exports = mongoose.model('Quiz', QuizSchema);

@@ -3,9 +3,10 @@ const Answer = require('../models/Answer');
 const Question = require('../models/Question');
 
 const asyncErrorWrapper = require('express-async-handler');
+const CustomError = require('../helpers/error/CustomError');
 
 const getSingleQuiz = asyncErrorWrapper(async (req, res, next) =>{ 
-    res.status(200).json({success:true})
+    res.status(200).json({success:true,quiz:req.quiz})
 });
 
 const addQuiz = asyncErrorWrapper(async (req, res, next) => { 
@@ -45,4 +46,25 @@ const addQuiz = asyncErrorWrapper(async (req, res, next) => {
     res.status(200).json({success:true,quizId});
 });
 
-module.exports = {getSingleQuiz,addQuiz};
+const getAllQuiz = asyncErrorWrapper(async (req, res, next) => {
+    
+    const quizs = await Quiz.find();
+
+    if (!quizs) return next(new CustomError("There is not quiz", 400));
+
+    res.status(200).json({ success: true, quizs });
+
+});
+
+const deleteQuiz = asyncErrorWrapper(async (req, res, next) => {
+    
+    const { quiz_id } = req.params;
+
+    const quiz = await Quiz.findById(quiz_id);
+
+    await quiz.remove();
+
+    return res.status(200).json({ success: true, message: 'Delete Quiz Succesfull' });
+})
+
+module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz};
