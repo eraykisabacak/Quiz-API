@@ -35,6 +35,10 @@ const addQuestion = asyncErrorWrapper(async (req, res, next) => {
     
     const { quiz_id } = req.params;
 
+    if (!req.body.correctAnswers ||
+        !req.body.incorrectAnswers ||
+        !req.body.questionContent) return next(new CustomError("correctAnswers , incorrectAnswers , questionContent required"));
+
     const { correctAnswers,incorrectAnswers, questionContent } = req.body;
     
     const question = await Question.create({ questionContent: questionContent,createdUser:req.user.id });
@@ -62,4 +66,20 @@ const addQuestion = asyncErrorWrapper(async (req, res, next) => {
 
 });
 
-module.exports = { getSingleQuestion, deleteQuestion,addQuestion}
+const putQuestion = asyncErrorWrapper(async (req, res, next) => { 
+    const { question_id } = req.params;
+
+    if (!req.body.questionContent) return next(new CustomError("Question Content is required"));
+
+    const { questionContent } = req.body;
+
+    const question = await Question.findById(question_id);
+
+    question.questionContent = questionContent;
+
+    await question.save();
+
+    res.status(200).json({ success: true, question });
+});
+
+module.exports = { getSingleQuestion, deleteQuestion,addQuestion,putQuestion}
