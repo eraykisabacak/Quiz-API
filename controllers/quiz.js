@@ -67,4 +67,18 @@ const deleteQuiz = asyncErrorWrapper(async (req, res, next) => {
     return res.status(200).json({ success: true, message: 'Delete Quiz Succesfull' });
 })
 
-module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz};
+const putQuiz = asyncErrorWrapper(async (req, res, next) => {
+    
+    const { quiz_id } = req.params;
+
+    const quiz = await Quiz.findById(quiz_id);
+
+    if (!req.body.name) return next(new CustomError("Name is required", 403));
+    
+    quiz.name = req.body.name;
+    await quiz.save();
+
+    return res.status(200).json({ success: true, message: 'Put Quiz Succesfull',quiz });
+})
+
+module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz,putQuiz};
