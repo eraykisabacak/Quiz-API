@@ -1,6 +1,8 @@
+const Answer = require('./Answer');
+const Quiz = require('./Quiz');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Answer = require('./Answer');
+
 const QuestionSchema = new Schema({
     questionContent: {
         type: String,
@@ -33,7 +35,7 @@ QuestionSchema.post('remove', async function () {
     await this.incorrectAnswers.forEach(async function (element) { 
         const answer = await Answer.findById(element);
         await answer.remove();
-    }); 
+    });
 })
 
 module.exports = mongoose.model('Question', QuestionSchema);
