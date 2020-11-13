@@ -46,4 +46,29 @@ const putAnswer = asyncErrorWrapper(async (req, res, next) => {
     res.status(200).json({success:true,answer:answerPut})
 });
 
-module.exports = {addAnswer,putAnswer};
+const deleteAnswer = asyncErrorWrapper(async (req, res, next) => { 
+    const { answer_id } = req.params;
+
+    const answer = await Answer.findById(answer_id);
+    const answerId = answer.id;
+
+    answer.remove();
+
+    const questionAnswerDelete = await Question.find({ $or: [{ correctAnswers: answerId }, { incorrectAnswers: answerId }] })
+    
+    const question = questionAnswerDelete[0];
+
+    if (question.correctAnswers.indexOf(answerId) > -1) {
+        const index = question.correctAnswers.indexOf(answerId);
+        question.correctAnswers.splice(index,1);
+        await question.save();
+    } else {
+        const index = question.incorrectAnswers.indexOf(answerId);
+        question.incorrectAnswers.splice(index,1);
+        await question.save();
+    }
+
+    res.status(200).json({ success: true, message: "Delete Answer successfull" });
+});
+
+module.exports = {addAnswer,putAnswer,deleteAnswer};
