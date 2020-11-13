@@ -71,4 +71,14 @@ const deleteAnswer = asyncErrorWrapper(async (req, res, next) => {
     res.status(200).json({ success: true, message: "Delete Answer successfull" });
 });
 
-module.exports = {addAnswer,putAnswer,deleteAnswer};
+const getAnswer = asyncErrorWrapper(async (req, res, next) => { 
+    const { answer_id } = req.params;
+
+    const answer = await Answer.findById(answer_id);
+
+    res.status(200).json({ success: true, answer });
+
+});
+
+
+module.exports = {addAnswer,putAnswer,deleteAnswer,getAnswer};
