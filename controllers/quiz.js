@@ -5,8 +5,14 @@ const Question = require('../models/Question');
 const asyncErrorWrapper = require('express-async-handler');
 const CustomError = require('../helpers/error/CustomError');
 
-const getSingleQuiz = asyncErrorWrapper(async (req, res, next) =>{ 
-    res.status(200).json({success:true,quiz:req.quiz})
+const getSingleQuiz = asyncErrorWrapper(async (req, res, next) => { 
+    const quiz = await Quiz.findById(req.quiz.id).populate({
+        path: 'questions',
+        populate: {
+            path: 'correctAnswers incorrectAnswers'
+        }
+    });
+    res.status(200).json({success:true,quiz:quiz})
 });
 
 const addQuiz = asyncErrorWrapper(async (req, res, next) => { 
@@ -48,7 +54,12 @@ const addQuiz = asyncErrorWrapper(async (req, res, next) => {
 
 const getAllQuiz = asyncErrorWrapper(async (req, res, next) => {
     
-    const quizs = await Quiz.find();
+    const quizs = await Quiz.find().populate({
+        path : 'questions',
+            populate : {
+                path : 'correctAnswers incorrectAnswers'
+            }
+    });
 
     if (!quizs) return next(new CustomError("There is not quiz", 400));
 

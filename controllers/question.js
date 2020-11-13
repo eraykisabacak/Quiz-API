@@ -4,12 +4,15 @@ const Question = require('../models/Question');
 const Quiz = require('../models/Quiz');
 const Answer = require('../models/Answer');
 
-const getSingleQuestion = (req, res, next) => {
+const getSingleQuestion = asyncErrorWrapper(async (req, res, next) => {
+
+    const question = await Question.findById(req.question.id).populate("correctAnswers incorrectAnswers");
+
     res.status(200).json({
         success: true,
-        question: req.question
+        question: question
     });
-}
+});
 
 const deleteQuestion = asyncErrorWrapper(async (req, res, next) => {
 
