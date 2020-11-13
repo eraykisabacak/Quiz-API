@@ -30,4 +30,20 @@ const addAnswer = asyncErrorWrapper(async (req, res, next) => {
 
 });
 
-module.exports = {addAnswer};
+const putAnswer = asyncErrorWrapper(async (req, res, next) => { 
+    const { answer_id } = req.params;
+
+    if (!req.body.answer) return next(new CustomError("Answer is required", 403));
+    
+    const { answer, correct } = req.body;
+
+    const answerPut = await Answer.findById(answer_id);
+
+    if (req.body.answer) answerPut.answer = answer;
+
+    answerPut.save();
+
+    res.status(200).json({success:true,answer:answerPut})
+});
+
+module.exports = {addAnswer,putAnswer};

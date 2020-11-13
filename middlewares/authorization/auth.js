@@ -5,6 +5,7 @@ const asyncErrorWrapper = require('express-async-handler');
 const { isTokenIncluded,getAccessTokenFromHeader } = require('../../helpers/authorization/tokenHelpers');
 const Quiz = require('../../models/Quiz');
 const Question = require('../../models/Question');
+const Answer = require('../../models/Answer');
 
 const getAccessToRoute = (req, res, next) => {
 
@@ -51,4 +52,16 @@ const getQuestionOwnerAccess = asyncErrorWrapper(async (req, res, next) => {
 
 });
 
-module.exports = {getAccessToRoute,getQuizOwnerAccess,getQuestionOwnerAccess}
+const getAnswerOwnerAccess = asyncErrorWrapper(async (req, res, next) => {
+    const { answer_id } = req.params;
+    const id = req.user.id;
+
+    const answer = await Answer.findById(answer_id);
+
+    if (answer.createdUser != id) return next(new CustomError("Only Owner Answer Can Handle This Operation", 403));
+
+    next();
+
+ });
+
+module.exports = {getAccessToRoute,getQuizOwnerAccess,getQuestionOwnerAccess,getAnswerOwnerAccess}

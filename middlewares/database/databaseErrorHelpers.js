@@ -2,6 +2,7 @@ const CustomError = require('../../helpers/error/CustomError');
 const asyncErrorWrapper = require('express-async-handler');
 const Quiz = require('../../models/Quiz');
 const Question = require('../../models/Question');
+const Answer = require('../../models/Answer');
 
 const checkQuizExist = asyncErrorWrapper(async (req, res, next) => {
     const { quiz_id } = req.params;
@@ -27,5 +28,16 @@ const checkQuestionExist = asyncErrorWrapper(async (req, res, next) => {
     next();
 });
 
+const checkAnswerExist = asyncErrorWrapper(async (req, res, next) => { 
+    const { answer_id } = req.params;
 
-module.exports = { checkQuizExist,checkQuestionExist };
+    const answer = await Answer.findById(answer_id);
+
+    if (!answer) return next(new CustomError('There is no such answer with that id', 400));
+    
+    req.answer = await answer;
+
+    next();
+});
+
+module.exports = { checkQuizExist,checkQuestionExist,checkAnswerExist };
