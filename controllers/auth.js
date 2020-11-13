@@ -1,8 +1,7 @@
 const User = require('../models/User');
 const asyncErrorWrapper = require('express-async-handler');
-const bcrypt = require('bcrypt')
-
 const CustomError = require('../helpers/error/CustomError');
+const bcrypt = require('bcrypt')
 
 const { sendToJWTToToken } = require('../helpers/authorization/tokenHelpers');
 
