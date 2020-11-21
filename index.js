@@ -7,9 +7,8 @@ const customErrorHandler = require('./middlewares/errors/customErrorHandler')
 
 const PORT = 3000 || process.env.PORT;
 
-dotenv.config({
-  path: './config/env/config.env',
-});
+// Environment Variables
+dotenv.config();
 
 // Connect Database
 connectDatabase();
