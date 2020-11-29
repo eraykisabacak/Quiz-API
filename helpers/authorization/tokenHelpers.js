@@ -16,7 +16,8 @@ const sendToJWTToToken = (user, res) => {
             access_token: token,
             data: {
                 username: user.username,
-                email: user.email
+                email: user.email,
+                expires: new Date(Date.now() + parseInt(JWT_COOKIE) * 1000 * 60),
             }
         });
 }

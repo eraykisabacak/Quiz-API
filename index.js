@@ -4,6 +4,9 @@ const dotenv = require('dotenv');
 const routers = require('./routers/index.js');
 const connectDatabase = require('./helpers/database/connectDatabase');
 const customErrorHandler = require('./middlewares/errors/customErrorHandler')
+var cors = require('cors')
+
+app.use(cors());
 
 const PORT = 3000 || process.env.PORT;
 
