@@ -55,7 +55,7 @@ const addQuiz = asyncErrorWrapper(async (req, res, next) => {
 const getAllQuiz = asyncErrorWrapper(async (req, res, next) => {
     
     const quizs = await Quiz.find().populate({
-        path : 'questions',
+        path : 'questions createdUser',
             populate : {
                 path : 'correctAnswers incorrectAnswers'
             }
