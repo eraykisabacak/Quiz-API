@@ -92,4 +92,33 @@ const putQuiz = asyncErrorWrapper(async (req, res, next) => {
     return res.status(200).json({ success: true, message: 'Put Quiz Succesfull',quiz });
 })
 
-module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz,putQuiz};
+const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
+    
+    const { quiz_id } = req.params;
+
+    const {userAnswers} = req.body;
+
+    const quiz = await Quiz.findById(quiz_id);
+
+    let resUserAnswers = []
+    for (const [key, value] of Object.entries(userAnswers)) {
+        for (const [key2, value2] of Object.entries(value)) { 
+            const question = await Question.find({ _id: key2, correctAnswers: { $in: value2._id } });
+            let response = {};
+            const resQuestion = await Question.findById(key2).populate('correctAnswers');;
+            response["questionId"] = resQuestion;
+            if (question.length > 0) {
+                response["answer"] = 1;
+                response["color"] = "success";
+            } else {
+                response["answer"] = 0;
+                response["color"] = "warning";
+            }
+            resUserAnswers.push(response);
+        }
+    }
+
+    return res.status(200).json({ success: true, questionAndAnswer:resUserAnswers});
+})
+
+module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz,putQuiz,quizUserAnswered};

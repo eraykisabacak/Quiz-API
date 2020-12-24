@@ -7,7 +7,6 @@ const QuestionSchema = new Schema({
     questionContent: {
         type: String,
         required: true,
-        minlength: 5,
     },
     correctAnswers: [
         {
