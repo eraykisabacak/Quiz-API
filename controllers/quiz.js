@@ -4,6 +4,7 @@ const Question = require('../models/Question');
 
 const asyncErrorWrapper = require('express-async-handler');
 const CustomError = require('../helpers/error/CustomError');
+const UserAnswers = require('../models/UserAnswers');
 
 const getSingleQuiz = asyncErrorWrapper(async (req, res, next) => { 
     const quiz = await Quiz.findById(req.quiz.id).populate({
@@ -95,17 +96,55 @@ const putQuiz = asyncErrorWrapper(async (req, res, next) => {
 const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
     
     const { quiz_id } = req.params;
+    const { userAnswers } = req.body;
 
-    const {userAnswers} = req.body;
+    const alreadyAnswered = await UserAnswers.find({ user: req.user.id, userAnsweredQuiz: { "$in": quiz_id } });
 
-    const quiz = await Quiz.findById(quiz_id);
+    if (alreadyAnswered.length > 0) {
+        return next(new CustomError("You already answered", 400));
+    }
 
-    let resUserAnswers = []
-    for (const [key, value] of Object.entries(userAnswers)) {
-        for (const [key2, value2] of Object.entries(value)) { 
-            const question = await Question.find({ _id: key2, correctAnswers: { $in: value2._id } });
+    let resUserAnswers = [];
+
+    let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
+    
+    if (!userAnswersDB) {
+        userAnswersDB = await UserAnswers.create({ user: req.user.id });
+    }
+
+    await userAnswersDB.userAnsweredQuiz.push(quiz_id);
+    await userAnswersDB.save();
+
+    let object = {};
+
+    userAnswers.forEach(async function (value, key) {
+        Object.keys(value).forEach(async function (value2) {
+            const question = await Question.find({ _id: value2, correctAnswers: { $in: value[value2]._id } });
             let response = {};
-            const resQuestion = await Question.findById(key2).populate('correctAnswers');;
+            const resQuestion = await Question.findById(value2).populate('correctAnswers');
+            response["questionId"] = resQuestion;
+            if (question.length > 0) {
+                response["answer"] = 1;
+                response["color"] = "success";
+                let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
+                await userAnswersDB.userAnswer.push({ quizId: quiz_id, questionId: value2, answerId: value[value2]._id, success: true });
+                await userAnswersDB.save();
+            } else {
+                response["answer"] = 0;
+                response["color"] = "warning";
+                let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
+                await userAnswersDB.userAnswer.push({ quizId: quiz_id, questionId: value2, answerId: value[value2]._id, success: false });
+                await userAnswersDB.save();
+            }
+        });
+    });
+   
+    for (const [key, value] of Object.entries(userAnswers)) {
+        for (const [key2, value2] of Object.entries(value)) {
+            const question = await Question.find({ _id: key2, correctAnswers: { $in: value2._id } });
+
+            let response = {};
+            const resQuestion = await Question.findById(key2).populate('correctAnswers');
             response["questionId"] = resQuestion;
             if (question.length > 0) {
                 response["answer"] = 1;
@@ -113,12 +152,28 @@ const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
             } else {
                 response["answer"] = 0;
                 response["color"] = "warning";
+                object["success"] = 0;
             }
             resUserAnswers.push(response);
         }
     }
 
-    return res.status(200).json({ success: true, questionAndAnswer:resUserAnswers});
-})
+    return res.status(200).json({ success: true, questionAndAnswer: resUserAnswers });
+});
 
-module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz,putQuiz,quizUserAnswered};
+const isJoinQuiz = asyncErrorWrapper(async (req, res, next) => { 
+
+    const { quiz_id } = req.params;
+
+    const alreadyAnswered = await UserAnswers.find({ user: req.user.id, userAnsweredQuiz: { "$in": quiz_id } });
+
+    console.log(alreadyAnswered);
+    
+    if (alreadyAnswered.length > 0) {
+        return res.status(200).json({ success: true, isJoin: false });
+    } else {
+        return res.status(200).json({ success: true, isJoin: true });
+    }
+});
+
+module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz,putQuiz,quizUserAnswered,isJoinQuiz};
