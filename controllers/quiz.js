@@ -139,6 +139,8 @@ const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
         });
     });
    
+    let correctCount = 0;
+    let incorrectCount = 0;
     for (const [key, value] of Object.entries(userAnswers)) {
         for (const [key2, value2] of Object.entries(value)) {
             const question = await Question.find({ _id: key2, correctAnswers: { $in: value2._id } });
@@ -148,17 +150,19 @@ const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
             response["questionId"] = resQuestion;
             if (question.length > 0) {
                 response["answer"] = 1;
+                correctCount++;
                 response["color"] = "success";
             } else {
                 response["answer"] = 0;
                 response["color"] = "warning";
+                incorrectCount++;
                 object["success"] = 0;
             }
             resUserAnswers.push(response);
         }
     }
 
-    return res.status(200).json({ success: true, questionAndAnswer: resUserAnswers });
+    return res.status(200).json({ success: true, questionAndAnswer: resUserAnswers,correctCount,incorrectCount });
 });
 
 const isJoinQuiz = asyncErrorWrapper(async (req, res, next) => { 
