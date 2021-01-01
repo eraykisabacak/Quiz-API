@@ -26,12 +26,17 @@ const UserAnswerSchema = new Schema({
             }
         }
     ],
-    userAnsweredQuiz: [
-        {
+    userAnsweredQuiz:{
             type: mongoose.Schema.ObjectId,
-            ref:"QuizId"
-        }
-    ]
+            ref:"Quiz"
+    },
+    correctCount: {
+        type: Number,
+    },
+    incorrectCount: {
+        type: Number,
+    }
+    
     
 });
 
