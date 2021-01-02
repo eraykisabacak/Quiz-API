@@ -8,25 +8,30 @@ const addAnswer = asyncErrorWrapper(async (req, res, next) => {
 
     const { question_id } = req.params;
 
-    if (!req.body.answer || !req.body.correct) return next(new CustomError("Answer and correct is required", 403));
+    if (!req.body.answers[0].answer || !req.body.answers[0].correct) return next(new CustomError("Answer and correct is required", 403));
 
-    const { answer,correct } = req.body; 
+    req.body.answers.forEach(async function (item, index) {
 
-    const answerCreated = await Answer.create({ answer: answer, createdUser: req.user.id });
-    
-    const question = await Question.findById(question_id);
+       // if (!req.body.answers[index].answer || !req.body.answers[index].correct) return next(new CustomError("Answer and correct is required", 403));
+        
+        const { answer, correct } = req.body.answers[index];
 
-    if (correct) {
-        console.log("Doğru", correct);
-        question.correctAnswers.push(answerCreated)
-        question.save();
-    } else {
-        console.log("Yanlış", correct);
-        question.incorrectAnswers.push(answerCreated);
-        question.save();            
-    }
-    
-    res.status(200).json({success:true,question})
+        const answerCreated = await Answer.create({ answer: answer, createdUser: req.user.id });
+        
+        const question = await Question.findById(question_id);
+
+        if (correct) {
+            console.log("Doğru", correct);
+            await question.correctAnswers.push(answerCreated)
+            await question.save();
+        } else {
+            console.log("Yanlış", correct);
+            await question.incorrectAnswers.push(answerCreated);
+            await question.save();
+        }
+    });
+
+    res.status(200).json({success:true})
 
 });
 

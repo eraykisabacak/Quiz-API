@@ -186,7 +186,7 @@ const isJoinQuiz = asyncErrorWrapper(async (req, res, next) => {
 
 const getAllMyQuiz = asyncErrorWrapper(async (req, res, next) => { 
 
-    const quizzes = await Quiz.find({ createdUser: req.user.id });
+    const quizzes = await Quiz.find({ createdUser: req.user.id }).populate('questions');
 
     return res.status(200).json({ success: true, quizzes });
 });
