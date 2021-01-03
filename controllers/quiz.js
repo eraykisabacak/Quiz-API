@@ -107,11 +107,7 @@ const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
     let resUserAnswers = [];
 
     let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
-    
-    if (!userAnswersDB) {
-        userAnswersDB = await UserAnswers.create({ user: req.user.id });
-    }
-
+    userAnswersDB = await UserAnswers.create({ user: req.user.id });
     userAnswersDB.userAnsweredQuiz = quiz_id;
     await userAnswersDB.save();
 
@@ -186,7 +182,13 @@ const isJoinQuiz = asyncErrorWrapper(async (req, res, next) => {
 
 const getAllMyQuiz = asyncErrorWrapper(async (req, res, next) => { 
 
-    const quizzes = await Quiz.find({ createdUser: req.user.id }).populate('questions');
+    const quizzes = await Quiz.find({ createdUser: req.user.id })
+        .populate({
+            path: 'questions',
+            populate: {
+                path:'correctAnswers incorrectAnswers'
+            }
+        })
 
     return res.status(200).json({ success: true, quizzes });
 });
