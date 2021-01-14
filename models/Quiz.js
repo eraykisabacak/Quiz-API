@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Question = require('./Question');
+const UserAnswers = require('./UserAnswers');
 const Schema = mongoose.Schema;
 
 const QuizSchema = new Schema({
@@ -27,7 +28,8 @@ QuizSchema.post('remove', async function () {
     await this.questions.forEach(async function (element) { 
         const question = await Question.findById(element);
         await question.remove();
-    });    
+    }); 
+    const userAnswers = await UserAnswers.findOneAndDelete({ userAnsweredQuiz: this.id });
 })
 
 module.exports = mongoose.model('Quiz', QuizSchema);
