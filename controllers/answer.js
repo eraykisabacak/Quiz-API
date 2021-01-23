@@ -10,7 +10,7 @@ const addAnswer = asyncErrorWrapper(async (req, res, next) => {
 
     if (!req.body.answers[0].answer || (req.body.answers[0].correct != 1 && req.body.answers[0].correct != 0)) return next(new CustomError("Answer and correct is required", 403));
 
-    /*req.body.answers.forEach(async function (item, index) {
+    req.body.answers.forEach(async function (item, index) {
 
        // if (!req.body.answers[index].answer || !req.body.answers[index].correct) return next(new CustomError("Answer and correct is required", 403));
         
@@ -29,7 +29,7 @@ const addAnswer = asyncErrorWrapper(async (req, res, next) => {
             await question.incorrectAnswers.push(answerCreated);
             await question.save();
         }
-    });*/
+    });
 
     res.status(200).json({success:true})
 
