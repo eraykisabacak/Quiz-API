@@ -106,10 +106,12 @@ const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
 
     let resUserAnswers = [];
 
-    let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
-    userAnswersDB = await UserAnswers.create({ user: req.user.id });
+    //let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
+    let userAnswersDB = await UserAnswers.create({ user: req.user.id });
     userAnswersDB.userAnsweredQuiz = quiz_id;
     await userAnswersDB.save();
+    let userAnswerId = userAnswersDB._id;
+    console.log(userAnswerId);
 
     let object = {};
 
@@ -122,13 +124,13 @@ const quizUserAnswered = asyncErrorWrapper(async (req, res, next) => {
             if (question.length > 0) {
                 response["answer"] = 1;
                 response["color"] = "success";
-                let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
+                let userAnswersDB = await UserAnswers.findById(userAnswerId);
                 await userAnswersDB.userAnswer.push({ quizId: quiz_id, questionId: value2, answerId: value[value2]._id, success: true });
                 await userAnswersDB.save();
             } else {
                 response["answer"] = 0;
                 response["color"] = "warning";
-                let userAnswersDB = await UserAnswers.findOne({ user: req.user.id });
+                let userAnswersDB = await UserAnswers.findById(userAnswerId);
                 await userAnswersDB.userAnswer.push({ quizId: quiz_id, questionId: value2, answerId: value[value2]._id, success: false });
                 await userAnswersDB.save();
             }
@@ -170,8 +172,6 @@ const isJoinQuiz = asyncErrorWrapper(async (req, res, next) => {
     const { quiz_id } = req.params;
 
     const alreadyAnswered = await UserAnswers.find({ user: req.user.id, userAnsweredQuiz: { "$in": quiz_id } });
-
-    console.log(alreadyAnswered);
     
     if (alreadyAnswered.length > 0) {
         return res.status(200).json({ success: true, isJoin: false });
