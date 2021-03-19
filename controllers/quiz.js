@@ -200,4 +200,30 @@ const getAllMyAnsweredQuiz = asyncErrorWrapper(async (req, res, next) => {
     return res.status(200).json({ success: true, quizzes });
 });
 
-module.exports = {getSingleQuiz,addQuiz, getAllQuiz,deleteQuiz,putQuiz,quizUserAnswered,isJoinQuiz,getAllMyQuiz,getAllMyAnsweredQuiz};
+const getQuizAnsweredUsersAndAnswers = asyncErrorWrapper(async (req, res, next) => {
+    const { quiz_id } = req.params;
+
+    const quizzes = await UserAnswers.find({ userAnsweredQuiz: quiz_id })
+        .populate('user')
+        .populate({
+            path: 'userAnswer',
+            populate: {
+                path: 'questionId answerId'
+            }
+        });
+
+    return res.status(200).json(quizzes);
+});
+
+module.exports = {
+    getSingleQuiz,
+    addQuiz,
+    getAllQuiz,
+    deleteQuiz,
+    putQuiz,
+    quizUserAnswered,
+    isJoinQuiz,
+    getAllMyQuiz,
+    getAllMyAnsweredQuiz,
+    getQuizAnsweredUsersAndAnswers
+};
